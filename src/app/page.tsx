@@ -1,95 +1,72 @@
 "use client";
 
+import Image from "next/image";
+
 import { useState } from "react";
 
-export default function Dashboard() {
+export default function LandingPage() {
   const [dark, setDark] = useState(false);
 
   return (
     <div className={dark ? "dark" : ""}>
-      <div className="flex min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors">
-        {/* Sidebar */}
-        <aside className="w-64 bg-white dark:bg-gray-800 shadow-md p-4 flex flex-col">
-          <h1 className="text-2xl font-bold mb-8 text-blue-600 dark:text-blue-400">
-            StudyTime
+      <main className="relative min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors overflow-hidden">
+        {/* Purple wave background */}
+        <div className="absolute top-0 right-0 h-full w-1/2 bg-gradient-to-br from-purple-500 to-indigo-600 clip-wave"></div>
+
+        {/* Navigation */}
+        <header className="flex justify-between items-center px-8 py-6 relative z-10">
+          <h1 className="text-2xl font-bold text-purple-600 dark:text-purple-300">
+            QuietStudy
           </h1>
-
-          <nav className="flex-1 space-y-4">
-            <a className="block font-medium text-gray-700 dark:text-gray-200">Dashboard</a>
-            <a className="block text-gray-600 dark:text-gray-400">New Block</a>
-            <a className="block text-gray-600 dark:text-gray-400">History</a>
-            <a className="block text-gray-600 dark:text-gray-400">Account</a>
+          <nav className="hidden md:flex gap-6 text-gray-700 dark:text-gray-200">
+            <a href="#about">About</a>
+            <a href="#features">Features</a>
+            <a href="/login">Login</a>
           </nav>
-
-          {/* Light/Dark toggle */}
           <button
             onClick={() => setDark(!dark)}
-            className="mt-auto flex items-center gap-2 px-3 py-2 rounded
-                       bg-gray-200 dark:bg-gray-700
-                       text-gray-800 dark:text-gray-100
-                       hover:bg-gray-300 dark:hover:bg-gray-600"
+            className="ml-4 px-3 py-1 rounded bg-gray-200 dark:bg-gray-700
+                       text-gray-800 dark:text-gray-100"
           >
-            {dark ? "☀️ Light Mode" : "🌙 Dark Mode"}
+            {dark ? "☀️" : "🌙"}
           </button>
-        </aside>
+        </header>
 
-        {/* Main Content */}
-        <main className="flex-1 p-8 text-gray-800 dark:text-gray-100">
-          <h2 className="text-3xl font-semibold mb-2">
-            Good afternoon, Robin!
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-8">
-            Here’s what’s happening with your silent-study schedule.
-          </p>
-
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-            <StatCard title="Upcoming Blocks" value="3" />
-            <StatCard title="Completed Blocks" value="5" />
-            <StatCard title="Total Blocks" value="8" />
+        {/* Content */}
+        <section className="relative z-10 flex flex-col md:flex-row items-center justify-between px-8 md:px-16 lg:px-24 pt-10 md:pt-20">
+          {/* Left text */}
+          <div className="max-w-lg text-center md:text-left mb-12 md:mb-0">
+            <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-gray-100 leading-tight">
+              Your Quiet Study Scheduler
+            </h2>
+            <p className="mt-4 text-gray-600 dark:text-gray-300">
+              Plan silent-study blocks and get reminders before each session.
+              Stay focused, stay consistent.
+            </p>
+            <a
+              href="/signup"
+              className="inline-block mt-6 px-6 py-3 rounded-lg bg-purple-600 hover:bg-purple-700
+                         text-white font-semibold shadow-lg"
+            >
+              Sign Up Free
+            </a>
           </div>
 
-          {/* Scheduled Blocks */}
-          <section className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 mb-10">
-            <h3 className="text-xl font-semibold mb-4">Scheduled Study Blocks</h3>
-            <ul className="divide-y divide-gray-200 dark:divide-gray-700">
-              {[
-                { start: "Today 6:00 PM", end: "8:00 PM" },
-                { start: "Tomorrow 9:00 AM", end: "11:00 AM" },
-                { start: "Friday 7:00 PM", end: "9:00 PM" },
-              ].map((b, i) => (
-                <li key={i} className="py-3 flex justify-between">
-                  <div>
-                    <p className="font-medium">{b.start} – {b.end}</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Created 2 hours ago
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </section>
+         {/* Right illustration */}
+          <div className="w-full md:w-1/2 flex justify-center">
+          <div className="relative h-64 w-64 md:h-80 md:w-80 rounded-xl shadow-xl overflow-hidden">
+          <Image
+            src="/study.jpeg"        
+            alt="Studying illustration"
+            fill                     
+            className="object-cover" 
+            priority
+           />
+         </div>
+        </div>
 
-          {/* Recent Activity */}
-          <section className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-            <h3 className="text-xl font-semibold mb-4">Recent Activity</h3>
-            <ul className="space-y-3">
-              <li>Reminder email sent for Today’s 6 PM block (10 mins ago)</li>
-              <li>New study block scheduled for Friday (1 hour ago)</li>
-              <li>Completed block: Yesterday 8 PM (12 hours ago)</li>
-            </ul>
-          </section>
-        </main>
-      </div>
-    </div>
-  );
-}
-
-function StatCard({ title, value }: { title: string; value: string }) {
-  return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 text-center">
-      <p className="text-4xl font-bold text-blue-600 dark:text-blue-400">{value}</p>
-      <p className="text-gray-600 dark:text-gray-300 mt-1">{title}</p>
+        </section>
+      </main>
     </div>
   );
 }
