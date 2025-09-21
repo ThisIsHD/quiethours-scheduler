@@ -9,8 +9,10 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@sendgrid/mail": "^8.1.6",
     "@supabase/supabase-js": "^2.57.4",
     "dotenv": "^17.2.2",
+    "mongodb": "^6.20.0",
     "next": "15.5.3",
     "react": "19.1.0",
     "react-dom": "19.1.0"

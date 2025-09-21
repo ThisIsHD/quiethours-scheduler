@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-
 import { useState } from "react";
 
 export default function LandingPage() {
@@ -9,27 +8,31 @@ export default function LandingPage() {
 
   return (
     <div className={dark ? "dark" : ""}>
-      <main className="relative min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors overflow-hidden">
-        {/* Purple wave background */}
-        <div className="absolute top-0 right-0 h-full w-1/2 bg-gradient-to-br from-purple-500 to-indigo-600 clip-wave"></div>
+      <main className="relative min-h-screen transition-colors overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute top-0 left-0 h-full w-full -z-10">
+          <Image
+            src="/study.jpeg"
+            alt="Study Background"
+            fill
+            className="object-cover"
+            priority
+          />
+        </div>
+
+        {/* Optional: Dark overlay to make text more readable */}
+        <div className="absolute top-0 left-0 h-full w-full bg-black/20 -z-5"></div>
 
         {/* Navigation */}
         <header className="flex justify-between items-center px-8 py-6 relative z-10">
-          <h1 className="text-2xl font-bold text-purple-600 dark:text-purple-300">
+          <h1 className="text-2xl font-bold text-purple-900 dark:text-purple-700">
             QuietStudy
           </h1>
-          <nav className="hidden md:flex gap-6 text-gray-700 dark:text-gray-200">
+          <nav className="hidden md:flex gap-6 text-gray-900 dark:text-gray-100">
             <a href="#about">About</a>
             <a href="#features">Features</a>
             <a href="/login">Login</a>
           </nav>
-          <button
-            onClick={() => setDark(!dark)}
-            className="ml-4 px-3 py-1 rounded bg-gray-200 dark:bg-gray-700
-                       text-gray-800 dark:text-gray-100"
-          >
-            {dark ? "☀️" : "🌙"}
-          </button>
         </header>
 
         {/* Content */}
@@ -39,7 +42,7 @@ export default function LandingPage() {
             <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-gray-100 leading-tight">
               Your Quiet Study Scheduler
             </h2>
-            <p className="mt-4 text-gray-600 dark:text-gray-300">
+            <p className="mt-4 text-gray-800 dark:text-purple-700">
               Plan silent-study blocks and get reminders before each session.
               Stay focused, stay consistent.
             </p>
@@ -51,20 +54,6 @@ export default function LandingPage() {
               Sign Up Free
             </a>
           </div>
-
-         {/* Right illustration */}
-          <div className="w-full md:w-1/2 flex justify-center">
-          <div className="relative h-64 w-64 md:h-80 md:w-80 rounded-xl shadow-xl overflow-hidden">
-          <Image
-            src="/study.jpeg"        
-            alt="Studying illustration"
-            fill                     
-            className="object-cover" 
-            priority
-           />
-         </div>
-        </div>
-
         </section>
       </main>
     </div>
