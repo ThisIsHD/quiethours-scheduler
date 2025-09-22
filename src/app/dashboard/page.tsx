@@ -4,28 +4,39 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../lib/supabaseClient";
 
+interface Block {
+  _id: string;
+  userId: string;
+  title: string;
+  date: string;
+  dayName: string;
+  startTime: string;
+  endTime: string;
+}
+
+type View = "dashboard" | "blocks" | "history" | "account";
+
 interface NewBlockFormProps {
   userId: string;
   onSuccess: () => void;
-  blockToEdit?: any; 
+  blockToEdit?: Block;
 }
 
 function NewBlockForm({ userId, onSuccess, blockToEdit }: NewBlockFormProps) {
-  const [title, setTitle] = useState(blockToEdit?.title || "");
-  const [date, setDate] = useState(blockToEdit?.date || "");
-  const [dayName, setDayName] = useState(blockToEdit?.dayName || "");
-  const [startTime, setStartTime] = useState(blockToEdit?.startTime || "");
-  const [endTime, setEndTime] = useState(blockToEdit?.endTime || "");
+  const [title, setTitle] = useState(blockToEdit?.title ?? "");
+  const [date, setDate] = useState(blockToEdit?.date ?? "");
+  const [dayName, setDayName] = useState(blockToEdit?.dayName ?? "");
+  const [startTime, setStartTime] = useState(blockToEdit?.startTime ?? "");
+  const [endTime, setEndTime] = useState(blockToEdit?.endTime ?? "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setError("");
-
     try {
-      let res;
+      let res: Response;
       if (blockToEdit) {
         res = await fetch("/api/blocks", {
           method: "PUT",
@@ -36,25 +47,23 @@ function NewBlockForm({ userId, onSuccess, blockToEdit }: NewBlockFormProps) {
           }),
         });
       } else {
-        // Create new block
         res = await fetch("/api/blocks", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ userId, title, date, dayName, startTime, endTime }),
         });
       }
-
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed");
-
       setTitle("");
       setDate("");
       setDayName("");
       setStartTime("");
       setEndTime("");
       onSuccess();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      if (err instanceof Error) setError(err.message);
+      else setError("Unknown error");
     } finally {
       setLoading(false);
     }
@@ -65,74 +74,62 @@ function NewBlockForm({ userId, onSuccess, blockToEdit }: NewBlockFormProps) {
       <h4 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center">
         {blockToEdit ? "Edit Study Block" : "Create New Study Block"}
       </h4>
-
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Block Title */}
         <label className="block">
           <span className="text-gray-700 dark:text-gray-300 text-lg">Block Title</span>
           <input
             type="text"
-            placeholder="e.g., Physics Midterm Prep"
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
             required
             className="mt-2 w-full p-4 border border-gray-300 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:border-blue-500 transition-all text-lg"
           />
         </label>
-
-        {/* Date & Day */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <label className="block">
             <span className="text-gray-700 dark:text-gray-300 text-lg">Date</span>
             <input
               type="date"
               value={date}
-              onChange={(e) => setDate(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDate(e.target.value)}
               required
               className="mt-2 w-full p-4 border border-gray-300 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:border-blue-500 transition-all text-lg"
             />
           </label>
-
           <label className="block">
             <span className="text-gray-700 dark:text-gray-300 text-lg">Day Name</span>
             <input
               type="text"
-              placeholder="e.g., Monday"
               value={dayName}
-              onChange={(e) => setDayName(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDayName(e.target.value)}
               required
               className="mt-2 w-full p-4 border border-gray-300 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:border-blue-500 transition-all text-lg"
             />
           </label>
         </div>
-
-        {/* Time Inputs */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <label className="block">
             <span className="text-gray-700 dark:text-gray-300 text-lg">Start Time</span>
             <input
               type="time"
               value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setStartTime(e.target.value)}
               required
               className="mt-2 w-full p-4 border border-gray-300 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:border-blue-500 transition-all text-lg"
             />
           </label>
-
           <label className="block">
             <span className="text-gray-700 dark:text-gray-300 text-lg">End Time</span>
             <input
               type="time"
               value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEndTime(e.target.value)}
               required
               className="mt-2 w-full p-4 border border-gray-300 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:border-blue-500 transition-all text-lg"
             />
           </label>
         </div>
-
         {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
-
         <button
           type="submit"
           disabled={loading}
@@ -151,24 +148,21 @@ export default function DashboardPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [dark, setDark] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [activeView, setActiveView] = useState<"dashboard" | "blocks" | "history" | "account">("dashboard");
-
-  const [blocks, setBlocks] = useState<any[]>([]);
-  const [editingBlock, setEditingBlock] = useState<any | null>(null);
-
+  const [activeView, setActiveView] = useState<View>("dashboard");
+  const [blocks, setBlocks] = useState<Block[]>([]);
+  const [editingBlock, setEditingBlock] = useState<Block | null>(null);
 
   const fetchBlocks = async () => {
     if (!userId) return;
     try {
       const res = await fetch(`/api/blocks?userId=${userId}`);
-      const data = await res.json();
+      const data: { blocks: Block[]; error?: string } = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to fetch blocks");
       setBlocks(data.blocks || []);
     } catch (err) {
       console.error(err);
     }
   };
-
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this block?")) return;
@@ -178,7 +172,7 @@ export default function DashboardPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
       });
-      const data = await res.json();
+      const data: { error?: string } = await res.json();
       if (!res.ok) throw new Error(data.error || "Delete failed");
       fetchBlocks();
     } catch (err) {
@@ -209,7 +203,12 @@ export default function DashboardPage() {
     router.replace("/login");
   }
 
-  if (loading) return <div className="flex min-h-screen items-center justify-center text-gray-700 dark:text-gray-300">Loading…</div>;
+  if (loading)
+    return (
+      <div className="flex min-h-screen items-center justify-center text-gray-700 dark:text-gray-300">
+        Loading…
+      </div>
+    );
 
   function renderMainContent() {
     switch (activeView) {
@@ -227,12 +226,16 @@ export default function DashboardPage() {
               <StatCard title="Completed Blocks" value="5" />
               <StatCard title="Total Blocks" value={blocks.length.toString()} />
             </div>
-
             <section className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
-              <h3 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">Scheduled Study Blocks</h3>
+              <h3 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">
+                Scheduled Study Blocks
+              </h3>
               <ul className="divide-y divide-gray-200 dark:divide-gray-700">
                 {blocks.map((b) => (
-                  <li key={b._id} className="py-4 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                  <li
+                    key={b._id}
+                    className="py-4 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  >
                     <div>
                       <p className="font-semibold text-gray-800 dark:text-gray-200">
                         {b.date} ({b.dayName}) {b.startTime} – {b.endTime}
@@ -240,8 +243,18 @@ export default function DashboardPage() {
                       <p className="text-sm text-gray-500 dark:text-gray-400">Created recently</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <button className="text-blue-500 hover:text-blue-700 text-sm" onClick={() => setEditingBlock(b)}>Edit</button>
-                      <button className="text-red-500 hover:text-red-700 text-sm" onClick={() => handleDelete(b._id)}>Delete</button>
+                      <button
+                        className="text-blue-500 hover:text-blue-700 text-sm"
+                        onClick={() => setEditingBlock(b)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="text-red-500 hover:text-red-700 text-sm"
+                        onClick={() => handleDelete(b._id)}
+                      >
+                        Delete
+                      </button>
                     </div>
                   </li>
                 ))}
@@ -274,25 +287,36 @@ export default function DashboardPage() {
   return (
     <div className={dark ? "dark" : ""}>
       <div className="flex min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors">
-        {/* Sidebar */}
         <aside className="w-64 bg-white dark:bg-gray-800 shadow-md p-4 flex flex-col">
           <h1 className="text-2xl font-bold mb-8 text-blue-600 dark:text-blue-400">StudyTime</h1>
           <nav className="flex-1 space-y-4">
             {["dashboard", "blocks", "history", "account"].map((tab) => (
-              <button key={tab} className={`block text-left w-full p-2 rounded-lg ${activeView === tab ? "font-bold bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100" : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"}`} onClick={() => setActiveView(tab as any)}>
+              <button
+                key={tab}
+                className={`block text-left w-full p-2 rounded-lg ${
+                  activeView === tab
+                    ? "font-bold bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                }`}
+                onClick={() => setActiveView(tab as View)}
+              >
                 {tab[0].toUpperCase() + tab.slice(1)}
               </button>
             ))}
           </nav>
-          <button onClick={handleLogout} className="w-full px-4 py-2 rounded-lg bg-red-500 text-white font-semibold hover:bg-red-600 transition-colors">Log out</button>
+          <button
+            onClick={handleLogout}
+            className="w-full px-4 py-2 rounded-lg bg-red-500 text-white font-semibold hover:bg-red-600 transition-colors"
+          >
+            Log out
+          </button>
         </aside>
-
-        {/* Main Content */}
         <main className="flex-1 p-8 text-gray-800 dark:text-gray-100">{renderMainContent()}</main>
       </div>
     </div>
   );
 }
+
 function StatCard({ title, value }: { title: string; value: string }) {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 text-center transform hover:scale-105 transition-transform duration-300">
