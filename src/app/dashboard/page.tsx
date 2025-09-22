@@ -135,7 +135,7 @@ function NewBlockForm({ userId, onSuccess, blockToEdit }: NewBlockFormProps) {
           disabled={loading}
           className="w-full py-4 mt-6 rounded-lg bg-blue-600 text-white font-bold text-xl hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors shadow-lg"
         >
-          {loading ? (blockToEdit ? "Updating..." : "Creating...") : (blockToEdit ? "Update Block" : "Create Block")}
+          {loading ? (blockToEdit ? "Updating..." : "Creating...") : blockToEdit ? "Update Block" : "Create Block"}
         </button>
       </form>
     </div>
@@ -146,7 +146,6 @@ export default function DashboardPage() {
   const router = useRouter();
   const [userName, setUserName] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
-  const [dark, setDark] = useState(false);
   const [loading, setLoading] = useState(true);
   const [activeView, setActiveView] = useState<View>("dashboard");
   const [blocks, setBlocks] = useState<Block[]>([]);
@@ -183,9 +182,8 @@ export default function DashboardPage() {
   useEffect(() => {
     const checkSession = async () => {
       const { data: { user }, error } = await supabase.auth.getUser();
-      if (error || !user) {
-        router.replace("/login");
-      } else {
+      if (!user || error) router.replace("/login");
+      else {
         setUserName(user.user_metadata?.full_name || user.email);
         setUserId(user.id);
         setLoading(false);
@@ -203,12 +201,7 @@ export default function DashboardPage() {
     router.replace("/login");
   }
 
-  if (loading)
-    return (
-      <div className="flex min-h-screen items-center justify-center text-gray-700 dark:text-gray-300">
-        Loading…
-      </div>
-    );
+  if (loading) return <div className="flex min-h-screen items-center justify-center text-gray-700 dark:text-gray-300">Loading…</div>;
 
   function renderMainContent() {
     switch (activeView) {
@@ -232,10 +225,7 @@ export default function DashboardPage() {
               </h3>
               <ul className="divide-y divide-gray-200 dark:divide-gray-700">
                 {blocks.map((b) => (
-                  <li
-                    key={b._id}
-                    className="py-4 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                  >
+                  <li key={b._id} className="py-4 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                     <div>
                       <p className="font-semibold text-gray-800 dark:text-gray-200">
                         {b.date} ({b.dayName}) {b.startTime} – {b.endTime}
@@ -243,18 +233,8 @@ export default function DashboardPage() {
                       <p className="text-sm text-gray-500 dark:text-gray-400">Created recently</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <button
-                        className="text-blue-500 hover:text-blue-700 text-sm"
-                        onClick={() => setEditingBlock(b)}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="text-red-500 hover:text-red-700 text-sm"
-                        onClick={() => handleDelete(b._id)}
-                      >
-                        Delete
-                      </button>
+                      <button className="text-blue-500 hover:text-blue-700 text-sm" onClick={() => setEditingBlock(b)}>Edit</button>
+                      <button className="text-red-500 hover:text-red-700 text-sm" onClick={() => handleDelete(b._id)}>Delete</button>
                     </div>
                   </li>
                 ))}
@@ -285,7 +265,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className={dark ? "dark" : ""}>
+    <div>
       <div className="flex min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors">
         <aside className="w-64 bg-white dark:bg-gray-800 shadow-md p-4 flex flex-col">
           <h1 className="text-2xl font-bold mb-8 text-blue-600 dark:text-blue-400">StudyTime</h1>
@@ -304,10 +284,7 @@ export default function DashboardPage() {
               </button>
             ))}
           </nav>
-          <button
-            onClick={handleLogout}
-            className="w-full px-4 py-2 rounded-lg bg-red-500 text-white font-semibold hover:bg-red-600 transition-colors"
-          >
+          <button onClick={handleLogout} className="w-full px-4 py-2 rounded-lg bg-red-500 text-white font-semibold hover:bg-red-600 transition-colors">
             Log out
           </button>
         </aside>
