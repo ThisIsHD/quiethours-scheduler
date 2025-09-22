@@ -27,7 +27,7 @@ export async function GET() {
     const now = new Date();
     const in10Min = new Date(now.getTime() + 10 * 60 * 1000);
     const targetDate = in10Min.toISOString().slice(0, 10);
-    const targetTime = in10Min.toTimeString().slice(0, 5); 
+    const targetTime = in10Min.toTimeString().slice(0, 5);
 
     const blocks = await collection
       .find({ date: targetDate, startTime: targetTime })
